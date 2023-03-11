@@ -1,4 +1,4 @@
-name: penumonia_detection
+name: pneumonia_detection
 channels:
   - bioconda
   - conda-forge
@@ -16,5 +16,8 @@ dependencies:
   - flake8
   - scikit-learn
   - jupyterlab
-  - tensorflow=2.9.1
-prefix: /home/uziel/miniconda3/envs/penumonia_detection
+  - torchvision
+  - pytorch-lightning
+  - albumentations
+  - opencv
+prefix: /home/uziel/miniconda3/envs/pneumonia_detection
