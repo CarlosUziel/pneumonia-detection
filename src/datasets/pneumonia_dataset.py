@@ -27,7 +27,7 @@ class PneumoniaDataset(Dataset):
         idx = idx.tolist() if isinstance(idx, Tensor) else idx
 
         image = read_image(
-            str(self.data.iloc[idx]["image_path"]), mode=ImageReadMode.GRAY
+            str(self.data.iloc[idx]["image_path"]), mode=ImageReadMode.RGB
         ) * (1.0 / 255)
         target = torch.tensor(float(self.data.iloc[idx]["pneumonia"]))
 
