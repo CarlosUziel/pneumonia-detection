@@ -1,10 +1,11 @@
+import multiprocessing
 from copy import deepcopy
 
 import pandas as pd
-import pytorch_lightning as pl
-import torch
 import torchvision.transforms as T
+from pytorch_lightning import LightningDataModule
 from sklearn.model_selection import train_test_split
+from torch.nn import Module
 from torch.utils.data import DataLoader
 
 from datasets.pneumonia_dataset import PneumoniaDataset
@@ -12,14 +13,14 @@ from datasets.pneumonia_dataset import PneumoniaDataset
 # Note - you must have torchvision installed for this example
 
 
-class PneumoniaDataModule(pl.LightningDataModule):
+class PneumoniaDataModule(LightningDataModule):
     """Pneumonia data module"""
 
     def __init__(
         self,
         data: pd.DataFrame,
+        required_transforms: Module,
         test_size: float = 0.1,
-        img_size: int = 256,
         label_col: str = "pneumonia",
         batch_size: int = 32,
         random_seed: bool = 8080,
@@ -29,8 +30,8 @@ class PneumoniaDataModule(pl.LightningDataModule):
 
         Args:
             data: Dataframe containing patient metadata and path to xrax image.
+            required_transforms: Must-have transforms for EfficientNetV2.
             test_size: Percentage of data destined for the testing set.
-            img_size: Images will be resized to this size.
             label_col: Column containing target labels. Also used for stratified splits.
             batch_size: How many images to load in a single batch.
             random_seed: Seed to initialize random state.
@@ -41,13 +42,7 @@ class PneumoniaDataModule(pl.LightningDataModule):
         self.label_col = label_col
         self.batch_size = batch_size
         self.random_seed = random_seed
-        self.pre_processing = T.Compose(
-            [
-                T.Resize(img_size),
-                T.ConvertImageDtype(torch.float),
-                T.Normalize(mean=[0.5], std=[0.2]),
-            ]
-        )
+        self.pre_processing = T.Compose([required_transforms])
         self.data_augmentation = T.Compose(
             [
                 T.RandomHorizontalFlip(p=0.5),
@@ -82,10 +77,22 @@ class PneumoniaDataModule(pl.LightningDataModule):
         self.test_dataset = PneumoniaDataset(test_data, self.pre_processing)
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size)
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            num_workers=multiprocessing.cpu_count() // 2,
+        )
 
     def val_dataloader(self):
-        return DataLoader(self.val_dataset, batch_size=self.batch_size)
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            num_workers=multiprocessing.cpu_count() // 2,
+        )
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.batch_size)
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            num_workers=multiprocessing.cpu_count() // 2,
+        )
