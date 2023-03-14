@@ -76,7 +76,7 @@ class PneumoniaClassifier(LightningModule):
         stats_scores = self.stats_scores(y_hat, y).float()
 
         return {
-            "loss": self.loss(y_hat, y.int()),
+            "loss": self.loss(y_hat, y),
             "accuracy": self.accuracy(y_hat, y.int()),
             "precision": self.precision_score(y_hat, y.int()),
             "recall": self.recall_score(y_hat, y.int()),
