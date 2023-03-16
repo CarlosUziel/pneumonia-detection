@@ -50,7 +50,7 @@ class PneumoniaClassifier(LightningModule):
             f"train_{name}": metric
             for name, metric in self._shared_eval_step(batch, batch_idx).items()
         }
-        self.log_dict(metrics)
+        self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=False)
         return metrics["train_loss"]
 
     def validation_step(self, batch, batch_idx):
@@ -58,7 +58,7 @@ class PneumoniaClassifier(LightningModule):
             f"val_{name}": metric
             for name, metric in self._shared_eval_step(batch, batch_idx).items()
         }
-        self.log_dict(metrics)
+        self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=True)
         return metrics
 
     def test_step(self, batch, batch_idx):
@@ -66,7 +66,7 @@ class PneumoniaClassifier(LightningModule):
             f"test_{name}": metric
             for name, metric in self._shared_eval_step(batch, batch_idx).items()
         }
-        self.log_dict(metrics)
+        self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=False)
         return metrics
 
     def _shared_eval_step(self, batch, batch_idx):
