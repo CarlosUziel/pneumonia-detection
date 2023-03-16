@@ -14,7 +14,7 @@ from datasets.pneumonia_dataset import PneumoniaDataset
 
 
 class PneumoniaDataModule(LightningDataModule):
-    """Pneumonia data module"""
+    """Pneumonia data module for binary classification"""
 
     def __init__(
         self,
@@ -23,6 +23,7 @@ class PneumoniaDataModule(LightningDataModule):
         test_size: float = 0.1,
         label_col: str = "pneumonia",
         batch_size: int = 32,
+        balance_train: bool = False,
         random_seed: bool = 8080,
     ):
         """
@@ -34,6 +35,9 @@ class PneumoniaDataModule(LightningDataModule):
             test_size: Percentage of data destined for the testing set.
             label_col: Column containing target labels. Also used for stratified splits.
             batch_size: How many images to load in a single batch.
+            balance_train: Whether to force-balance the training set by randomly
+                sampling the most abundant class to be equal to the least abundant
+                class.
             random_seed: Seed to initialize random state.
         """
         super().__init__()
@@ -41,7 +45,10 @@ class PneumoniaDataModule(LightningDataModule):
         self.test_size = test_size
         self.label_col = label_col
         self.batch_size = batch_size
+        self.balance_train = balance_train
         self.random_seed = random_seed
+
+        # transforms
         self.pre_processing = T.Compose([required_transforms])
         self.data_augmentation = T.Compose(
             [
@@ -69,7 +76,19 @@ class PneumoniaDataModule(LightningDataModule):
             stratify=train_data[self.label_col],
         )
 
-        # 3. Setup datasets
+        # 3. Balance training samples if flag is on
+        if self.balance_train:
+            pneumonia_samples = train_data[train_data["pneumonia"] == 1]
+            train_data = pd.concat(
+                [
+                    pneumonia_samples,
+                    train_data[train_data["pneumonia"] == 0].sample(
+                        len(pneumonia_samples), random_state=self.random_seed
+                    ),
+                ]
+            )
+
+        # 4. Setup datasets
         train_transforms = deepcopy(self.pre_processing)
         train_transforms.transforms.extend(self.data_augmentation.transforms)
         self.train_dataset = PneumoniaDataset(train_data, train_transforms)
@@ -79,6 +98,7 @@ class PneumoniaDataModule(LightningDataModule):
     def train_dataloader(self):
         return DataLoader(
             self.train_dataset,
+            shuffle=True,
             batch_size=self.batch_size,
             num_workers=multiprocessing.cpu_count() // 2,
         )
