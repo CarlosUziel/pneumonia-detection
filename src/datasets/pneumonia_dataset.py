@@ -8,7 +8,7 @@ from torchvision.io import ImageReadMode, read_image
 
 
 class PneumoniaDataset(Dataset):
-    """A dataset containing x-rax images with the presence of absence of pneumonia"""
+    """A dataset containing x-ray images with the presence or absence of pneumonia"""
 
     def __init__(self, data: pd.DataFrame, transform: Callable = None):
         """
