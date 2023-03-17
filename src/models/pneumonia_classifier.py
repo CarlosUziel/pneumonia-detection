@@ -45,6 +45,9 @@ class PneumoniaClassifier(LightningModule):
     def get_required_transforms():
         return MobileNet_V3_Large_Weights.DEFAULT.transforms
 
+    def forward(self, img):
+        return self.model(img)
+
     def training_step(self, batch, batch_idx):
         metrics = {
             f"train_{name}": metric
