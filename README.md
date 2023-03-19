@@ -1,194 +1,162 @@
-# Pneumonia Detection from Chest X-Rays
+<div id="top"></div>
 
-## Project Overview
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <img src="images/title.png" alt="Pneumonia Examples" width="700" height="400">
 
-In this project, you will apply the skills that you have acquired in this 2D medical imaging course to analyze data from the NIH Chest X-ray Dataset and train a CNN to classify a given chest x-ray for the presence or absence of pneumonia. This project will culminate in a model that can predict the presence of pneumonia with human radiologist-level accuracy that can be prepared for submission to the FDA for 510(k) clearance as software as a medical device. As part of the submission preparation, you will formally describe your model, the data that it was trained on, and a validation plan that meets FDA criteria.
+  <h3 align="center">Detecting the presence of pneumonia on chest x-ray images</h3>
 
-You will be provided with the medical images with clinical labels for each image that were extracted from their accompanying radiology reports.
+</div>
 
-The project will include access to a GPU for fast training of deep learning architecture, as well as access to 112,000 chest x-rays with disease labels acquired from 30,000 patients.
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#premise">Premise</a></li>
+        <li><a href="#data">Data</a></li>
+        <li><a href="#execution-plan">Execution Plan</a></li>
+        <li><a href="#challenges-and-improvements">Challenges and improvements</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#setting-up-a-conda-environment">Setting up a conda environment</a></li>
+        <li><a href="#usage">Usage</a></li>
+        <li><a href="#file-descriptions">File descriptions</a></li>
+      </ul>
+    </li>
+    <li><a href="#additional-notes">Additional Notes</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
-## Pneumonia and X-Rays in the Wild
+---
 
-Chest X-ray exams are one of the most frequent and cost-effective types of medical imaging examinations. Deriving clinical diagnoses from chest X-rays can be challenging, however, even by skilled radiologists.
+## About The Project
 
-When it comes to pneumonia, chest X-rays are the best available method for diagnosis. More than 1 million adults are hospitalized with pneumonia and around 50,000 die from the disease every
-year in the US alone. The high prevalence of pneumonia makes it a good candidate for the development of a deep learning application for two reasons: 1) Data availability in a high enough quantity for training deep learning models for image classification 2) Opportunity for clinical aid by providing higher accuracy image reads of a difficult-to-diagnose disease and/or reduce clinical burnout by performing automated reads of very common scans.
+In this mini-project, I developed a pneumonia classifier based on a CNN-based deep learning architecture. The goal is to be able to predict the presence or absence of pneumonia on chest x-ray images.
 
-The diagnosis of pneumonia from chest X-rays is difficult for several reasons:
+### Premise
 
-1. The appearance of pneumonia in a chest X-ray can be very vague depending on the stage of the infection
-2. Pneumonia often overlaps with other diagnoses
-3. Pneumonia can mimic benign abnormalities
+Routine checks of x-ray images is a very time-consuming tasks that nonetheless requires expert radiologists that have trained for years to become imaging professionals. With the advent of artificial intelligence, machine learning (ML) algorithms can be incorporated into the medical workflow to aid radiologists in their work.
 
-For these reasons, common methods of diagnostic validation performed in the clinical setting are to obtain sputum cultures to test for the presence of bacteria or viral bodies that cause pneumonia, reading the patient's clinical history and taking their demographic profile into account, and comparing a current image to prior chest X-rays for the same patient if they are available.
+Medical devices that are powered by ML algorithms can perform a multitude of tasks to make radiologists more efficient. For example, it can be used in screening studies, disease prediction and worklist prioritization.
 
-## About the Dataset
+The goal of such devices is not to replace the radiologist, but to work alongisde them to improve the accuracy and efficiency of their diagnoses.
 
-The dataset provided to you for this project was curated by the NIH specifically to address the problem of a lack of large x-ray datasets with ground truth labels to be used in the creation of disease detection algorithms.
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-The data is mounted in the Udacity Jupyter GPU workspace provided to you, along with code to load the data. Alternatively, you can download the data from the [kaggle website](https://www.kaggle.com/nih-chest-xrays/data) or official [NIH website](https://nihcc.app.box.com/v/ChestXray-NIHCC) and run it locally. You are STRONGLY recommended to complete the project using the Udacity workspace since the data is huge, and you will need GPU to accelerate the training process.
+### Data
 
-There are 112,120 X-ray images with disease labels from 30,805 unique patients in this dataset. The disease labels were created using Natural Language Processing (NLP) to mine the associated radiological reports. The labels include 14 common thoracic pathologies:
+This project uses chest x-ray images from the NIH dataset [available on Kaggle](https://www.kaggle.com/datasets/nih-chest-xrays/data). The data mainly consists of two parts:
 
-- Atelectasis
-- Consolidation
-- Infiltration
-- Pneumothorax
-- Edema
-- Emphysema
-- Fibrosis
-- Effusion
-- Pneumonia
-- Pleural thickening
-- Cardiomegaly
-- Nodule
-- Mass
-- Hernia
+- **Images**: 112,120 X-ray images with disease labels from 30,805 unique patients.
+- **Metadata**: Metadata of all images including technical imaging information as well as patient fields such as age and gender. Finally, one or more disease labels are included.
 
-The biggest limitation of this dataset is that image labels were NLP-extracted so there could be some erroneous labels but the NLP labeling accuracy is estimated to be >90%.
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-The original radiology reports are not publicly available but you can find more details on the labeling process [here.](https://arxiv.org/abs/1705.02315)
+### Execution plan
 
-### Dataset Contents
+In order to process the data and build the classification model, the following steps were taken:
 
-1. 112,120 frontal-view chest X-ray PNG images in 1024\*1024 resolution (under images folder)
-2. Meta data for all images (Data_Entry_2017.csv): Image Index, Finding Labels, Follow-up #,
-   Patient ID, Patient Age, Patient Gender, View Position, Original Image Size and Original Image
-   Pixel Spacing.
+1. **Exploratory Data Analysis**: We load, clean, transform and visualize the data as needed.
+2. **Model Building**: We setup all the necessary classes and functions to train our pneumonia classifier. This includes choices such as data splits and model hyper-parameters.
+3. **Model Evaluation**: We use an exhaustive list of performance metrics to validate the predictions during and after training.
+4. **Inference on DICOM files**: We test our algorithm in a simulated real-world case where the input images are DICOM files directly sent from the imaging devices.
 
-## Project Steps
+### Challenges and improvements
 
-### 1. Exploratory Data Analysis
+This project was developed as a quick proof of concept, and therefore there were many areas left unexplored that could certainly be improved upon. On top of that, the lack of proper GPU resources made iterating through different solutions a painstaking process, which explains why a small architecture was chosen to train the pneumonia classifier instead of a fancier state of the art architecture.
 
-The first part of this project will involve exploratory data analysis (EDA) to understand and describe the content and nature of the data.
+Having said that, apart from trying out different architectures and hyper-parameters, more effort could have been put in data pre-processing. Data cleaning is, though incredibly time consuming, one of the most important tasks, if not the most important one, in data science, significantly affecting the final results when done properly.
 
-Note that much of the work performed during your EDA will enable the completion of the final component of this project which is focused on documentation of your algorithm for the FDA. This is described in a later section, but some important things to focus on during your EDA may be:
+It is unclear whether the accuracy of the labels claimed by the authors is reliable or not, and whether all images have the same quality. There are for example many images in the dataset with considerably big artifacts present, such as cables and other devices appearing between the patient and the x-ray machine. This can naturally affect the final outcome of the model and is something that needs to be incorporated in the algorithm if such artifacts are unavoidable.
 
-- The patient demographic data such as gender, age, patient position,etc. (as it is available)
-- The x-ray views taken (i.e. view position)
-- The number of cases including:
-  - number of pneumonia cases,
-  - number of non-pneumonia cases
-- The distribution of other diseases that are comorbid with pneumonia
-- Number of disease per patient
-- Pixel-level assessments of the imaging data for healthy & disease states of interest (e.g. histograms of intensity values) and compare distributions across diseases.
+To sum up, while there are definitely a myriad of more powerful architectures and hyper-parameter combinations that could be used to improve predictions, data pre-processing plays such a key role taht, when properly done, it dramatically affect the final performance of the algorithm.
 
-### 2. Building and Training Your Model
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-**Training and validating Datasets**
+---
 
-From your findings in the EDA component of this project, curate the appropriate training and validation sets for classifying pneumonia. Be sure to take the following into consideration:
+## Getting Started
 
-- Distribution of diseases other than pneumonia that are present in both datasets
-- Demographic information, image view positions, and number of images per patient in each set
-- Distribution of pneumonia-positive and pneumonia-negative cases in each dataset
+To make use of this project, I recommend managing the required dependencies with Anaconda.
 
-**Model Architecture**
+### Setting up a conda environment
 
-In this project, you will fine-tune an existing CNN architecture to classify x-rays images for the presence of pneumonia. There is no required archictecture required for this project, but a reasonable choice would be using the VGG16 architecture with weights trained on the ImageNet dataset. Fine-tuning can be performed by freezing your chosen pre-built network and adding several new layers to the end to train, or by doing this in combination with selectively freezing and training some layers of the pre-trained network.
+Install miniconda:
 
-**Image Pre-Processing and Augmentation**
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+```
 
-You may choose or need to do some amount of preprocessing prior to feeding imagees into your network for training and validating. This may serve the purpose of conforming to your model's architecture and/or for the purposes of augmenting your training dataset for increasing your model performance. When performing image augmentation, be sure to think about augmentation parameters that reflect real-world differences that may be seen in chest X-rays.
+Install mamba:
 
-**Training**
+```bash
+conda install -n base -c conda-forge mamba
+```
 
-In training your model, there are many parameters that can be tweaked to improve performance including:
+Install environment using provided file:
 
-- Image augmentation parameters
-- Training batch size
-- Training learning rate
-- Inclusion and parameters of specific layers in your model
+```bash
+mamba env create -f environment.yml # alternatively use environment_hist.yml if base system is not debian
+mamba activate pneumonia_detection
+```
 
-You will be asked to provide descriptions of the methods by which given parameters were chosen in the final FDA documentation.
+### Usage
 
-**Performance Assessment**
+This project is organized in a series of Jupyter notebooks that can be run in order:
 
-As you train your model, you will monitor its performance over subsequence training epochs. Choose the appropriate metrics upon which to monitor performance. Note that 'accuracy' may not be the most appropriate statistic in this case, depending on the balance or imbalance of your validation dataset, and also depending on the clinical context that you want to use this model in (i.e. can you sacrafice high false positive rate for a low false negative rate?)
+1. **Exploratory Data Analysis**: `notebooks/0_eda.ipynb`.
+2. **Data Modeling and Evaluation**: `notebooks/1_modeling.ipynb`.
+3. **Inference**: `notebooks/2_inference.ipynb`.
 
-**Note that detecting pneumonia is _hard_ even for trained expert radiologists, so you should _not_ expect to acheive sky-high performance.** [This paper](https://arxiv.org/pdf/1711.05225.pdf) describes some human-reader-level F1 scores for detecting pneumonia, and can be used as a reference point for how well your model could perform.
+### File descriptions
 
-### 3. Clinical Workflow Integration
+The project files are structured as follows:
 
-The imaging data provided to you for training your model was transformed from DICOM format into .png to help aid in the image pre-processing and model training steps of this project. In the real world, however, the pixel-level imaging data are contained inside of standard DICOM files.
+- `data/model_outputs`: Files of the pre-trained pneumonia classifier.
+- `data/test_dicom`: A series of DICOM files used to test model inference.
+- `notebooks`: Location of the three main project notebooks as well as the FDA report.
+- `src/data_modules`: Contains the source code of the Pytorch Lightning data module classes.
+- `src/datasets`: Contains the source code of Pytorch dataset clases.
+- `src/models`: Contains the source code of the classifier model.
+- `src/utils.py`: Utility functions.
 
-For this project, create a DICOM wrapper that takes in a standard DICOM file and outputs data in the format accepted by your model. Be sure to include several checks in your wrapper for the following:
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-- Proper image acquisition type (i.e. X-ray)
-- Proper image acquisition orientation (i.e. those present in your training data)
-- Proper body part in acquisition
+---
 
-### 4. FDA Submission
+## Additional Notes
 
-For this project, you will complete the following steps that are derived from the FDA's official guidance on both the algorithm description and the algorithm performance assessment. **_Much of this portion of the project relies on what you did during your EDA, model building, and model training. Use figures and statistics from those earlier parts in completing the following documentation._**
+Source files formatted using the following commands:
 
-**1. General Information:**
+```bash
+isort .
+autoflake -r --in-place --remove-unused-variable --remove-all-unused-imports --ignore-init-module-imports .
+black .
+```
 
-- First, provide an Intended Use statement for your model
-- Then, provide some indications for use that should include:
-  - Target population
-  - When your device could be utilized within a clinical workflow
-- Device limitations, including diseases/conditions/abnormalities for which the device has been found ineffective and should not be used
-- Explain how a false positive or false negative might impact a patient
+## License
 
-**2. Algorithm Design and Function**
+Distributed under the MIT License. See `LICENSE` for more information.
 
-In this section, describe your _fully trained_ algorithm and the DICOM header checks that you have built around it. Include a flowchart that describes the following:
+## Contact
 
-- Any pre-algorithm checks you perform on your DICOM
-- Any preprocessing steps performed by your algorithm on the original images (e.g. normalization)
-  - Note that this section should _not_ include augmentation
-- The architecture of the classifier
+[Carlos Uziel Pérez Malla](https://www.carlosuziel-pm.dev/)
 
-For each stage of your algorithm, briefly describe the design and function.
+[GitHub](https://github.com/CarlosUziel) - [Google Scholar](https://scholar.google.es/citations?user=tEz_OeIAAAAJ&hl=es&oi=ao) - [LinkedIn](https://at.linkedin.com/in/carlos-uziel-p%C3%A9rez-malla-323aa5124) - [Twitter](https://twitter.com/perez_malla)
 
-**3. Algorithm Training**
+## Acknowledgments
 
-Describe the following parameters of your algorithm and how they were chosen:
+This project was done as part of the [AI for Healthcare Nanodegree Program at Udacity](https://www.udacity.com/course/ai-for-healthcare-nanodegree--nd320).
 
-- Types of augmentation used during training
-- Batch size
-- Optimizer learning rate
-- Layers of pre-existing architecture that were frozen
-- Layers of pre-existing architecture that were fine-tuned
-- Layers added to pre-existing architecture
-
-Also describe the behavior of the following throughout training (use visuals to show):
-
-- Training loss
-- Validation loss
-
-Describe the algorithm's final performance after training was complete by showing a precision-recall curve on your validation set.
-
-Finally, report the threshold for classification that you chose and the corresponded F1 score, recall, and precision. Give one or two sentences of explanation for why you chose this threshold value.
-
-**4. Databases**
-
-For the database of patient data used, provide specific information about the training and validation datasets that you curated separately, including:
-
-- Size of the dataset
-- The number of positive cases and the its radio to the number of negative cases
-- The patient demographic data (as it is available)
-- The radiologic techniques used and views taken
-- The co-occurrence frequencies of pneumonia with other diseases and findings
-
-**5. Ground Truth**
-
-The methodology used to establish the ground truth can impact reported performance. Describe how the NIH created the ground truth for the data that was provided to you for this project. Describe the benefits and limitations of this type of ground truth.
-
-**6. FDA Validation Plan**
-
-You will simply _describe_ how a FDA Validation Plan would be conducted for your algorithm, rather than actually performing the assessment. Describe the following:
-
-- The patient population that you would request imaging data from from your clinical partner. Make sure to include:
-
-  - Age ranges
-  - Sex
-  - Type of imaging modality
-  - Body part imaged
-  - Prevalence of disease of interest
-  - Any other diseases that should be included _or_ excluded as comorbidities in the population
-
-- Provide a short explanation of how you would obtain an optimal ground truth
-- Provide a performance standard that you choose based on [this paper.](https://arxiv.org/pdf/1711.05225.pdf)
+<p align="right">(<a href="#top">back to top</a>)</p>
