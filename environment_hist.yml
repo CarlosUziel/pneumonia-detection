@@ -18,6 +18,9 @@ dependencies:
   - jupyterlab
   - torchvision
   - pytorch-lightning
-  - albumentations
   - opencv
+  - rich
+  - ca-certificates
+  - certifi
+  - openssl
 prefix: /home/uziel/miniconda3/envs/pneumonia_detection
